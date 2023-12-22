@@ -39,8 +39,31 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: 20,),
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: Duration(seconds: 1),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.scale(
+                        scale: value,
+                        child: Text(
+                          'Pokemon Missed You!',
+                          style: TextStyle(
+                            fontSize: 48.0,
+                            fontWeight: FontWeight.bold,
+                            color: kSecondaryColor,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 20,),
                 CustomTextField(
                   hint: 'Enter Your Email',
+                  textInputAction: TextInputAction.next,
                   onChanged: (value) {
                     context.read<LoginCubit>().emailChanged(value);
                   },
@@ -50,6 +73,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 CustomTextField(
                   hint: 'Enter Your Password',
+                  textInputAction: TextInputAction.done,
                   onChanged: (value) {
                     context.read<LoginCubit>().passwordChanged(value);
                   },

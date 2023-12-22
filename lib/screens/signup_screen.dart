@@ -30,8 +30,31 @@ class SignupScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 20,),
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: const Duration(seconds: 1),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.scale(
+                        scale: value,
+                        child: const Text(
+                          'Pokemon Say\'s Wellcome',
+                          style: TextStyle(
+                            fontSize: 48.0,
+                            fontWeight: FontWeight.bold,
+                            color: kSecondaryColor,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20,),
                 CustomTextField(
                   hint: 'Enter Your Email',
+                  textInputAction: TextInputAction.next,
                   onChanged: (value) {
                     context.read<SignupCubit>().emailChanged(value);
                     print('email: $value');
@@ -42,6 +65,7 @@ class SignupScreen extends StatelessWidget {
                 ),
                 CustomTextField(
                   hint: 'Enter Your Password',
+                  textInputAction: TextInputAction.done,
                   onChanged: (value) {
                     context.read<SignupCubit>().passwordChanged(value);
                   },
@@ -58,7 +82,7 @@ class SignupScreen extends StatelessWidget {
                     await context.read<SignupCubit>().signupWithCredential();
                   },
                 ),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20,),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(

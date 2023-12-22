@@ -2,7 +2,9 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pokedex/constants.dart';
 
+import '../blocs/auth/auth_bloc.dart';
 import '../models/pokemon_model.dart';
 import '../repositories/pokemon_repository.dart';
 
@@ -14,7 +16,7 @@ class HomeScreen extends StatefulWidget {
   static Route route() {
     return MaterialPageRoute(
       settings: const RouteSettings(name: routeName),
-      builder: (BuildContext context) => HomeScreen(),
+      builder: (BuildContext context) => const HomeScreen(),
     );
   }
 
@@ -24,16 +26,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late List<Pokemon> _pokemons;
-  late List<int> _favoriteIds;
+  late List<String> _favoriteIds;
 
   @override
   void initState() {
     super.initState();
     _pokemons = [];
     _favoriteIds = [];
+    _fetchPokemons(context);
   }
 
-  Future<void> _fetchPokemons(BuildContext context) async {
+  void _fetchPokemons(BuildContext context) async {
     final repository = context.read<PokeApiRepository>();
     try {
       final List<Pokemon> pokemons = await repository.fetchPokemons();
@@ -47,15 +50,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _toggleFavoriteStatus(
-      int pokemonId, bool isFavorite, BuildContext context) async {
+      String pokemonName, bool isFavorite, BuildContext context) async {
     final repository = context.read<PokeApiRepository>();
     try {
       // await repository.toggleFavoritePokemon(pokemonId, isFavorite);
       setState(() {
         if (isFavorite) {
-          _favoriteIds.add(pokemonId);
+          _favoriteIds.add(pokemonName);
         } else {
-          _favoriteIds.remove(pokemonId);
+          _favoriteIds.remove(pokemonName);
         }
       });
     } catch (e) {
@@ -64,45 +67,42 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  bool _isFavorite(int pokemonId) {
-    return _favoriteIds.contains(pokemonId);
+  bool _isFavorite(String pokemonName) {
+    return _favoriteIds.contains(pokemonName);
   }
 
   @override
   Widget build(BuildContext context) {
-    PokeApiRepository pokeApiRepository = PokeApiRepository();
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Pokémon List'),
+        title: const Text('Pokémon List'),
+        actions: [
+          TextButton(
+              onPressed: () async => await context.read<AuthBloc>().signOut(),
+              child: const Text('Logout'))
+        ],
         centerTitle: true,
       ),
       body: _pokemons.isEmpty
-          ? Center(
-              child: ElevatedButton(
-              onPressed: () {
-                context.read<PokeApiRepository>().fetchPokemons();
-              },
-              child: Text('Load Pokemon'),
-            ))
+          ? const Center(
+              child: CircularProgressIndicator(color: kPrimaryColor,))
           : ListView.builder(
               itemCount: _pokemons.length,
               itemBuilder: (context, index) {
                 final pokemon = _pokemons[index];
-                return Text(pokemon.name);
-                // return ListTile(
-                //   title: Text(pokemon.name),
-                //   trailing: IconButton(
-                //     icon: _isFavorite(int.parse(pokemon.id))
-                //         ? Icon(Icons.favorite, color: Colors.red)
-                //         : Icon(Icons.favorite_border),
-                //     onPressed: () {
-                //       _toggleFavoriteStatus(int.parse(pokemon.id),
-                //           !_isFavorite(int.parse(pokemon.id)), context);
-                //     },
-                //   ),
-                // );
+                return ListTile(
+                  title: Text(pokemon.name),
+                  trailing: IconButton(
+                    icon: _isFavorite(pokemon.name)
+                        ? const Icon(Icons.favorite, color: Colors.red)
+                        : const Icon(Icons.favorite_border),
+                    onPressed: () {
+                      _toggleFavoriteStatus(
+                          pokemon.name, !_isFavorite(pokemon.name), context);
+                    },
+                  ),
+                );
               },
             ),
     );
