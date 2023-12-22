@@ -34,7 +34,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   // }
 
   void _onUserChanged(User? user) {
-    print('_onUserChanged : Listen on Auth called: ${user}');
     if (user == null) {
       emit(const AuthState.unauthenticated());
     } else {
