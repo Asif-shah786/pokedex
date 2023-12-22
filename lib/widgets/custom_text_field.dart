@@ -6,22 +6,21 @@ class CustomTextField extends StatelessWidget {
     Key? key,
     required this.hint,
     this.onChanged,
-    this.onSubmitted,
-    this.textInputAction,
+    this.textInputAction, this.validator,
   }) : super(key: key);
 
   final String hint;
   final Function(String)? onChanged;
-  final Function(String)? onSubmitted;
   final TextInputAction? textInputAction;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: TextField(
+      child: TextFormField(
+        validator: validator,
         onChanged: onChanged,
-        onSubmitted: onSubmitted,
         textInputAction: textInputAction ?? TextInputAction.done,
         decoration: InputDecoration(
           fillColor: Colors.white,

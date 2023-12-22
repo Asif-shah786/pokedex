@@ -53,8 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _toggleFavoriteStatus(String pokemonName, bool isFavorite,
-      BuildContext context) async {
+  Future<void> _toggleFavoriteStatus(
+      String pokemonName, bool isFavorite, BuildContext context) async {
     final repository = context.read<PokeApiRepository>();
     try {
       // await repository.toggleFavoritePokemon(pokemonId, isFavorite);
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       listener: (context, state) {
         if (state is InternetGainedState) {
           showToast(context, 'Internet connection Active', Colors.green);
-        }else if (state is InternetLossState) {
+        } else if (state is InternetLossState) {
           showToast(context, 'No internet connection.', Colors.red);
         }
       },
@@ -98,25 +98,27 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: _pokemons.isEmpty
             ? const Center(
-            child: CircularProgressIndicator(color: kPrimaryColor,))
+                child: CircularProgressIndicator(
+                color: kPrimaryColor,
+              ))
             : ListView.builder(
-          itemCount: _pokemons.length,
-          itemBuilder: (context, index) {
-            final pokemon = _pokemons[index];
-            return ListTile(
-              title: Text(pokemon.name),
-              trailing: IconButton(
-                icon: _isFavorite(pokemon.name)
-                    ? const Icon(Icons.favorite, color: Colors.red)
-                    : const Icon(Icons.favorite_border),
-                onPressed: () {
-                  _toggleFavoriteStatus(
-                      pokemon.name, !_isFavorite(pokemon.name), context);
+                itemCount: _pokemons.length,
+                itemBuilder: (context, index) {
+                  final pokemon = _pokemons[index];
+                  return ListTile(
+                    title: Text(pokemon.name),
+                    trailing: IconButton(
+                      icon: _isFavorite(pokemon.name)
+                          ? const Icon(Icons.favorite, color: Colors.red)
+                          : const Icon(Icons.favorite_border),
+                      onPressed: () {
+                        _toggleFavoriteStatus(
+                            pokemon.name, !_isFavorite(pokemon.name), context);
+                      },
+                    ),
+                  );
                 },
               ),
-            );
-          },
-        ),
       ),
     );
   }

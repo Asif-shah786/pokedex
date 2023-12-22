@@ -9,9 +9,9 @@ class AuthRepository extends BaseAuthRepository {
 
   @override
   Future<User?> signup({required String email, required String password}) async  {
-    print('Signup called');
     try{
       final credential = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+
       final user = credential.user;
       return user;
     }

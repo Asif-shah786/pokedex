@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pokedex/validators.dart';
 import 'package:pokedex/cubits/singnup/signup_cubit.dart';
 import 'package:pokedex/cubits/singnup/signup_cubit.dart';
 import 'package:pokedex/screens/login_screen.dart';
@@ -9,14 +10,16 @@ import 'package:pokedex/widgets/custom_text_field.dart';
 import '../constants.dart';
 
 class SignupScreen extends StatelessWidget {
-  const SignupScreen({super.key});
+  SignupScreen({super.key});
 
   static const String routeName = '/signup';
+
+  final formKey = GlobalKey<FormState>();
 
   static Route route() {
     return MaterialPageRoute(
       settings: const RouteSettings(name: routeName),
-      builder: (BuildContext context) => const SignupScreen(),
+      builder: (BuildContext context) => SignupScreen(),
     );
   }
 
@@ -31,44 +34,56 @@ class SignupScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 20,),
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: const Duration(seconds: 1),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.scale(
-                        scale: value,
-                        child: const Text(
-                          'Pokemon Say\'s Wellcome',
-                          style: TextStyle(
-                            fontSize: 48.0,
-                            fontWeight: FontWeight.bold,
-                            color: kSecondaryColor,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: const Duration(seconds: 1),
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Transform.scale(
+                          scale: value,
+                          child: const Text(
+                            'Pokemon Say\'s Welcome',
+                            style: TextStyle(
+                              fontSize: 48.0,
+                              fontWeight: FontWeight.bold,
+                              color: kSecondaryColor,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
                 const SizedBox(height: 20,),
-                CustomTextField(
-                  hint: 'Enter Your Email',
-                  textInputAction: TextInputAction.next,
-                  onChanged: (value) {
-                    context.read<SignupCubit>().emailChanged(value);
-                    print('email: $value');
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                CustomTextField(
-                  hint: 'Enter Your Password',
-                  textInputAction: TextInputAction.done,
-                  onChanged: (value) {
-                    context.read<SignupCubit>().passwordChanged(value);
-                  },
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      CustomTextField(
+                        validator: validateEmail,
+                        hint: 'Enter Your Email',
+                        textInputAction: TextInputAction.next,
+                        onChanged: (value) {
+                          context.read<SignupCubit>().emailChanged(value);
+                          print('email: $value');
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      CustomTextField(
+                        validator: validatePassword,
+                        hint: 'Enter Your Password',
+                        textInputAction: TextInputAction.done,
+                        onChanged: (value) {
+                          context.read<SignupCubit>().passwordChanged(value);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
@@ -79,6 +94,7 @@ class SignupScreen extends StatelessWidget {
                   endColor: kSecondaryColor,
                   textColor: Colors.white,
                   onPressed: () async {
+                    if(!formKey.currentState!.validate())return;
                     await context.read<SignupCubit>().signupWithCredential();
                   },
                 ),
